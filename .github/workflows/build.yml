@@ -1,4 +1,4 @@
-name: Cloud Marlin Build (Fixed 2.1.2.9)
+name: Cloud Marlin Build (Native Bugfix)
 
 on:
   workflow_dispatch:
@@ -7,42 +7,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Your Config Files
+    - name: Checkout Code Repository
       uses: actions/checkout@v3
-
-    - name: Create Workspace Directory
-      run: mkdir -p workspace
-
-    - name: Download Marlin 2.1.2.9 Source
-      run: |
-        curl -L -o marlin.zip https://github.com
-
-    - name: Extract Marlin Source
-      run: unzip marlin.zip
-
-    - name: Move Source to Workspace
-      run: cp -r Marlin-2.1.2.9/* workspace/
-
-    - name: Overwrite with Your Custom Configuration files
-      run: |
-        cp Marlin/Configuration.h workspace/Marlin/Configuration.h
-        cp Marlin/Configuration_adv.h workspace/Marlin/Configuration_adv.h
 
     - name: Set up Python Engine
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
 
-    - name: Install PlatformIO compiler
+    - name: Install PlatformIO Compiler
       run: pip install -U platformio
 
     - name: Compile Custom CR-10 Firmware
-      run: |
-        cd workspace
-        platformio run -e STM32G0B1RE_btt
+      run: platformio run -e STM32G0B1RE_btt
 
     - name: Upload Ready Firmware Binary
       uses: actions/upload-artifact@v4
       with:
         name: Custom_CR10_Firmware
-        path: workspace/.pio/build/STM32G0B1RE_btt/firmware.bin
+        path: .pio/build/STM32G0B1RE_btt/firmware.bin
