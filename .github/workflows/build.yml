@@ -7,34 +7,41 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Your Uploaded Config Files
+    - name: Checkout Your Config Files
       uses: actions/checkout@v3
 
-    - name: Download Matching Marlin 2.1.2.9 Source Code
-      run: |
-        wget https://github.com
-        unzip 2.1.2.9.zip
-        mv Marlin-2.1.2.9 workspace
+    - name: Create Workspace Directory
+      run: mkdir -p workspace
 
-    - name: Overwrite with Your Custom Configurations
+    - name: Download Marlin 2.1.2.9 Source
+      run: |
+        curl -L -o marlin.zip https://github.com
+
+    - name: Extract Marlin Source
+      run: unzip marlin.zip
+
+    - name: Move Source to Workspace
+      run: cp -r Marlin-2.1.2.9/* workspace/
+
+    - name: Overwrite with Your Custom Configuration files
       run: |
         cp Marlin/Configuration.h workspace/Marlin/Configuration.h
         cp Marlin/Configuration_adv.h workspace/Marlin/Configuration_adv.h
 
-    - name: Set up Python
+    - name: Set up Python Engine
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
 
-    - name: Install PlatformIO Core
+    - name: Install PlatformIO compiler
       run: pip install -U platformio
 
-    - name: Run Firmware Compile Routine
+    - name: Compile Custom CR-10 Firmware
       run: |
         cd workspace
         platformio run -e STM32G0B1RE_btt
 
-    - name: Upload Finished Firmware Binary
+    - name: Upload Ready Firmware Binary
       uses: actions/upload-artifact@v4
       with:
         name: Custom_CR10_Firmware
