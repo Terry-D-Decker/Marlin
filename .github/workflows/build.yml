@@ -1,0 +1,28 @@
+name: Cloud Marlin Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install PlatformIO Core
+      run: pip install -U platformio
+
+    - name: Run Firmware Compile Routine
+      run: platformio run -e STM32G0B1RE_btt
+
+    - name: Upload Finished Firmware Binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: Custom_CR10_Firmware
+        path: .pio/build/STM32G0B1RE_btt/firmware.bin
